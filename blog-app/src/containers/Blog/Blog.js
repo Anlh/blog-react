@@ -8,9 +8,20 @@ import {
 
 import './Blog.css';
 import Posts from './Posts/Posts';
-import NewPost from './NewPost/NewPost';
+import asyncComponent from '../../hoc/asyncComponent';
+// import NewPost from './NewPost/NewPost';
+
+// This is specially useful to minimize the size of the main bundle that is shipped to the server
+// This is called separately in a pre created chunk from webpack
+const AsyncNewPost = asyncComponent(() => {
+    // Dynamic import syntax
+    return import('./NewPost/NewPost');
+});
 
 class Blog extends Component {
+    state = {
+        auth: true
+    };
 
     render() {
         return (
@@ -37,9 +48,11 @@ class Blog extends Component {
                 </header>
                 {/*<Route path="/" exact render={() => <h1>Home</h1>} />*/}
                 <Switch>
-                    <Route path="/new-post" component={NewPost}/>
+                    {this.state.auth ? <Route path="/new-post" component={AsyncNewPost}/> : null}
                     <Route path="/posts" component={Posts}/>
-                    <Redirect from="/" to="/posts"/>
+                    {/* this route will handle with any route that has not been specified*/}
+                    <Route render={() => <h1>404 Not found</h1>}/>
+                    {/*<Redirect from="/" to="/posts"/>*/}
                     {/*<Route path="/" component={Posts}/>*/}
                 </Switch>
             </div>

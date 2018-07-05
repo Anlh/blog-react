@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import axios from 'axios';
+import {Redirect} from 'react-router-dom';
 
 import './NewPost.css';
 
@@ -7,12 +8,10 @@ class NewPost extends Component {
     state = {
         title: '',
         content: '',
-        author: 'Max'
+        author: 'Max',
+        submitted: false
     };
 
-    componentDidMount() {
-
-    }
 
     postDataHandler = () => {
         const post = {
@@ -22,13 +21,26 @@ class NewPost extends Component {
         };
         axios.post('/posts', post)
             .then(response => {
-                console.log(response);
+                // this.setState({submitted: true});
+                // History keep a stack of history pages that user navigate
+                // We can test this by simple clicking on the back button from the browser
+                this.props.history.push('/posts');
+                // If instead we use the history.replace, it cleans the history this is the same as using Redirect component
+                // this.props.history.replace('/posts');
             });
     };
 
     render() {
+        let redirect = null;
+
+        // Render a component to redirect the current page to other one if the form has been successful submitted to the server
+        if (this.state.submitted) {
+            redirect = <Redirect to="/posts" />
+        }
+
         return (
             <div className="NewPost">
+                {redirect}
                 <h1>Add a Post</h1>
                 <label>Title</label>
                 <input type="text" value={this.state.title}
